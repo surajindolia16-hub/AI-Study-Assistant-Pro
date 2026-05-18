@@ -1,0 +1,161 @@
+import os
+import json
+import math
+import sys
+from collections import Counter
+
+class MobileAIStudyEngine:
+    """
+    Highly optimized Heuristic Knowledge Engine leveraging Native Vector Math
+    and Cosine Similarity for zero-dependency semantic retrieval.
+    """
+    def __init__(self, database_path="mobile_knowledge_matrix.json"):
+        self.database_path = database_path
+        self.notes = self._load_database()
+        
+    def _load_database(self):
+        if os.path.exists(self.database_path):
+            try:
+                with open(self.database_path, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                pass
+        return []
+
+    def _save_database(self):
+        with open(self.database_path, "w", encoding="utf-8") as f:
+            json.dump(self.notes, f, indent=4)
+
+    def inject_note(self, content):
+        content = content.strip()
+        if not content:
+            print("\n[!] Input Validation Failed: Content cannot be empty.")
+            return
+        self.notes.append(content)
+        self._save_database()
+        print(f"\n✓ [Data Pipeline]: Document indexed. Total System Size: {len(self.notes)}")
+
+    def display_metrics(self):
+        if not self.notes:
+            print("\n[!] Database Matrix is currently empty.")
+            return
+        print("\n=======================================================")
+        print("---           STORED ACADEMIC KNOWLEDGE             ---")
+        print("=======================================================")
+        for idx, note in enumerate(self.notes, start=1):
+            print(f"📄 Node [#{idx:02d}] -> {note}")
+        print("=======================================================")
+
+    def _compute_cosine_similarity(self, query):
+        documents = [doc.lower().split() for doc in self.notes]
+        query_words = query.lower().split()
+        
+        if not documents or not query_words:
+            return None, 0.0
+
+        # Build Vocabulary Vector Space
+        all_words = set(word for doc in documents for word in doc)
+        all_words.update(query_words)
+        word_list = list(all_words)
+        
+        num_docs = len(documents)
+        df_dict = Counter()
+        for doc in documents:
+            for word in set(doc):
+                df_dict[word] += 1
+
+        # Calculate Query Vector
+        query_tf = Counter(query_words)
+        query_vec = {}
+        for word in query_words:
+            tf = query_tf[word] / len(query_words)
+            idf = math.log((1 + num_docs) / (1 + df_dict[word])) + 1
+            query_vec[word] = tf * idf
+
+        best_match_idx = -1
+        highest_similarity = 0.0
+
+        # Run Cosine Similarity Math over Documents
+        for idx, doc in enumerate(documents):
+            doc_tf = Counter(doc)
+            doc_vec = {}
+            for word in doc:
+                tf = doc_tf[word] / len(doc)
+                idf = math.log((1 + num_docs) / (1 + df_dict[word])) + 1
+                doc_vec[word] = tf * idf
+
+            # Dot Product Math
+            dot_product = 0.0
+            for word in query_vec:
+                if word in doc_vec:
+                    dot_product += query_vec[word] * doc_vec[word]
+
+            # Vector Norms
+            q_norm = math.sqrt(sum(val ** 2 for val in query_vec.values()))
+            d_norm = math.sqrt(sum(val ** 2 for val in doc_vec.values()))
+
+            if q_norm == 0 or d_norm == 0:
+                continue
+
+            similarity = dot_product / (q_norm * d_norm)
+            if similarity > highest_similarity:
+                highest_similarity = similarity
+                best_match_idx = idx
+
+        if best_match_idx != -1 and highest_similarity > 0.05:
+            return self.notes[best_match_idx], highest_similarity
+        return None, 0.0
+
+    def query_semantic_engine(self, query):
+        if not self.notes:
+            print("\n[!] Engine Warning: No context models loaded.")
+            return
+
+        match, confidence = self._compute_cosine_similarity(query)
+        print("\n[🔍 Active Engine Operational]: Scanning tensor space via matrix vector weights...")
+        if match:
+            print(f"💡 [Heuristic Match Detected] (Confidence Rank: {confidence:.4f})")
+            print(f"📖 Context Output: \"{match}\"")
+        else:
+            print("[*] Target out of mathematical bounds. Fallback engine activated...")
+            self._static_fallback(query.lower())
+
+    def _static_fallback(self, query):
+        if "python" in query:
+            print("🤖 AI Fallback: Core computational language stack recognized.")
+        elif "ai" in query:
+            print("🤖 AI Fallback: Synthetic automated cognitive matrix parameters active.")
+        else:
+            print("❌ System Status 404: Context mathematically unmappable.")
+
+def main():
+    engine = MobileAIStudyEngine()
+    print("===================================================================")
+    print("===       HEURISTIC VECTOR INTELLIGENCE ENGINE (v1.0.4)         ===")
+    print("===================================================================")
+
+    while True:
+        print("\n[SYSTEM CONSOLE INTEGERS]")
+        print("1. Push Node Data Pipeline")
+        print("2. Survey System Memory")
+        print("3. Query Tensor Vector Search")
+        print("4. Safe Kill Thread")
+
+        choice = input("\nExecute Sub-System Command (1-4): ").strip()
+
+        if choice == "1":
+            data = input("\n📝 Stream input data or study parameters: ")
+            engine.inject_note(data)
+        elif choice == "2":
+            engine.display_metrics()
+        elif choice == "3":
+            user_query = input("\n🔮 Enter search parameter phrase: ")
+            engine.query_semantic_engine(user_query)
+        elif choice == "4":
+            print("\n[+] Saving vectors... Terminating execution. System Core Offline.")
+            sys.exit(0)
+        else:
+            print("\n[⚠️ Error]: Operational integrity compromised. Invalid console option.")
+
+if __name__ == "__main__":
+    main()
