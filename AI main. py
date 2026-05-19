@@ -1,18 +1,21 @@
+
 import os
 import json
 import math
 import sys
+import time  # LEVEL 3: Performance tracking pipeline
 from collections import Counter
 
 class MobileAIStudyEngine:
     """
     Highly optimized Heuristic Knowledge Engine leveraging Native Vector Math
     and Cosine Similarity for zero-dependency semantic retrieval.
+    [LEVEL 3 PATENT-READY ARCHITECTURE]
     """
     def __init__(self, database_path="mobile_knowledge_matrix.json"):
         self.database_path = database_path
         self.notes = self._load_database()
-        
+
     def _load_database(self):
         if os.path.exists(self.database_path):
             try:
@@ -49,22 +52,20 @@ class MobileAIStudyEngine:
     def _compute_cosine_similarity(self, query):
         documents = [doc.lower().split() for doc in self.notes]
         query_words = query.lower().split()
-        
+
         if not documents or not query_words:
             return None, 0.0
 
-        # Build Vocabulary Vector Space
         all_words = set(word for doc in documents for word in doc)
         all_words.update(query_words)
         word_list = list(all_words)
-        
+
         num_docs = len(documents)
         df_dict = Counter()
         for doc in documents:
             for word in set(doc):
                 df_dict[word] += 1
 
-        # Calculate Query Vector
         query_tf = Counter(query_words)
         query_vec = {}
         for word in query_words:
@@ -75,7 +76,6 @@ class MobileAIStudyEngine:
         best_match_idx = -1
         highest_similarity = 0.0
 
-        # Run Cosine Similarity Math over Documents
         for idx, doc in enumerate(documents):
             doc_tf = Counter(doc)
             doc_vec = {}
@@ -84,13 +84,11 @@ class MobileAIStudyEngine:
                 idf = math.log((1 + num_docs) / (1 + df_dict[word])) + 1
                 doc_vec[word] = tf * idf
 
-            # Dot Product Math
             dot_product = 0.0
             for word in query_vec:
                 if word in doc_vec:
                     dot_product += query_vec[word] * doc_vec[word]
 
-            # Vector Norms
             q_norm = math.sqrt(sum(val ** 2 for val in query_vec.values()))
             d_norm = math.sqrt(sum(val ** 2 for val in doc_vec.values()))
 
@@ -111,8 +109,17 @@ class MobileAIStudyEngine:
             print("\n[!] Engine Warning: No context models loaded.")
             return
 
+        # LEVEL 3: Microsecond Resolution Clock Start
+        start_time = time.perf_counter()
+        
         match, confidence = self._compute_cosine_similarity(query)
+        
+        # LEVEL 3: Clock Stop & Performance Delta Calculation
+        execution_delta = (time.perf_counter() - start_time) * 1000  # Convert to milliseconds
+
         print("\n[🔍 Active Engine Operational]: Scanning tensor space via matrix vector weights...")
+        print(f"⚡ [Performance Benchmark]: Execution resolved in {execution_delta:.4f} ms")
+        
         if match:
             print(f"💡 [Heuristic Match Detected] (Confidence Rank: {confidence:.4f})")
             print(f"📖 Context Output: \"{match}\"")
@@ -131,7 +138,7 @@ class MobileAIStudyEngine:
 def main():
     engine = MobileAIStudyEngine()
     print("===================================================================")
-    print("===       HEURISTIC VECTOR INTELLIGENCE ENGINE (v1.0.4)         ===")
+    print("===            ASSISTANT PRO: VECTOR ENGINE (v1.0.4)            ===")
     print("===================================================================")
 
     while True:
