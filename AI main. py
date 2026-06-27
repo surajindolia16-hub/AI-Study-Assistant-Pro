@@ -99,4 +99,4 @@ class MobileAIStudyEngine:
 if __name__ == "__main__":
     engine = MobileAIStudyEngine()
     print("AI STUDY ASSISTANT PRO [System Ready]")
-    # Baki apna menu wahi rakh jo pehle tha...
+    
